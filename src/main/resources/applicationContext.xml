@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--Spring扫描除Controller之外的注解-->
+    <context:component-scan base-package="org.hxd.*">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--读取数据库配置文件信息-->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!--连接池配置-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <!-- 数据库基本信息配置 -->
+        <property name="url" value="${url}" />
+        <property name="username" value="${uname}" />
+        <property name="password" value="${upass}" />
+        <property name="driverClassName" value="${driverClassName}" />
+        <property name="filters" value="${filters}" />
+        <!-- 最大并发连接数 -->
+        <property name="maxActive" value="${maxActive}" />
+        <!-- 初始化连接数量 -->
+        <property name="initialSize" value="${initialSize}" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="${maxWait}" />
+        <!-- 最小空闲连接数 -->
+        <property name="minIdle" value="${minIdle}" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />
+        <property name="validationQuery" value="${validationQuery}" />
+        <property name="testWhileIdle" value="${testWhileIdle}" />
+        <property name="testOnBorrow" value="${testOnBorrow}" />
+        <property name="testOnReturn" value="${testOnReturn}" />
+        <property name="maxOpenPreparedStatements" value="${maxOpenPreparedStatements}" />
+        <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandoned" value="${removeAbandoned}" />
+        <!-- 1800秒，也就是30分钟 -->
+        <property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}" />
+        <!-- 关闭abanded连接时输出错误日志 -->
+        <property name="logAbandoned" value="${logAbandoned}" />
+    </bean>
+
+    <!--定义事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--配置事务属性-->
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <tx:method name="add*"    rollback-for="java.lang.Exception"/>
+            <tx:method name="insert*" rollback-for="java.lang.Exception"/>
+            <tx:method name="save*"   rollback-for="java.lang.Exception"/>
+
+            <tx:method name="delete*" rollback-for="java.lang.Exception"/>
+            <tx:method name="remove*" rollback-for="java.lang.Exception"/>
+
+            <tx:method name="update*" rollback-for="java.lang.Exception"/>
+            <tx:method name="modify*" rollback-for="java.lang.Exception"/>
+            <tx:method name="merge*"  rollback-for="java.lang.Exception"/>
+
+            <tx:method name="get*"    read-only="true"/>
+            <tx:method name="load*"   read-only="true"/>
+            <tx:method name="find*"   read-only="true"/>
+            <tx:method name="select*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--事务生效配置-->
+    <aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* org.hxd.service..*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+
+    <!--事务管理器配置，注解式事务生效的配置，若使用注解式事务，则可以将上述事务配置注释-->
+    <!--<transaction:annotation-driven transaction-manager="transactionManager"/>-->
+
+    <!--sqlSessionFactory工厂，创建sqlSessionTemplate-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="mapperLocations">
+            <array>
+                <value>classpath*:/mapper/**/*.xml</value>
+            </array>
+        </property>
+    </bean>
+
+    <!--mybatis核心对象-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory"/>
+    </bean>
+
+    <!--扫描Mapper接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="org.hxd.mapper"/>
+    </bean>
+</beans>

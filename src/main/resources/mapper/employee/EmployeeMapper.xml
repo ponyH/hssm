@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.hxd.mapper.IEmployeeMapper">
+
+    <resultMap id="empResult" type="employee">
+        <id column="empId" property="empId"/>
+        <result column="empName" property="empName"/>
+        <result column="empAge" property="empAge"/>
+        <result column="empSex" property="empSex"/>
+    </resultMap>
+
+    <insert id="addEmployee" parameterType="employee" keyProperty="empId">
+        insert into tb_employee(empName, empAge, empSex) values(#{empName}, #{empAge}, #{empSex})
+    </insert>
+
+    <select id="findEmpById" parameterType="int" resultMap="empResult">
+        select * from tb_employee where empId = #{empId}
+    </select>
+
+    <update id="modifyEmpById" parameterType="employee">
+        update tb_employee set empName = #{empName} where empId = #{empId}
+    </update>
+
+    <delete id="removeEmpById" parameterType="int">
+        delete from tb_employee where empId = #{empId}
+    </delete>
+</mapper>
