@@ -102,4 +102,13 @@
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
         <property name="basePackage" value="org.hxd.mapper"/>
     </bean>
+
+    <!--配置aop前置通知，记住书写格式-->
+    <aop:config>
+        <aop:pointcut id="aopPointcut" expression="execution(* org.hxd.service.*.*(..))"/>
+        <aop:advisor advice-ref="beforeAdvice" pointcut-ref="aopPointcut"/>
+        <aop:advisor advice-ref="afterAdvice" pointcut-ref="aopPointcut"/>
+        <aop:advisor advice-ref="exceptionAdvice" pointcut-ref="aopPointcut"/>
+        <aop:advisor advice-ref="aroundAdvice" pointcut-ref="aopPointcut"/>
+    </aop:config>
 </beans>
