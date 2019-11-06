@@ -1,0 +1,35 @@
+1、注解方式实现aop
+    需要的依赖与实现接口方式做aop相同
+
+2、与实现接口方式做aop的区别
+    只是写法不同，其实本质是一样的
+
+3、注解式实现aop的注意点
+    1、切面类的@Component注解不能忘记加
+    2、注解方式实现aop时，业务方法和通知是通过@Before注解实现关联的
+    3、注解式aop需要在Spring配置文件中加上<aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="true"/>
+       因为Spring默认情况下不支持注解方式aop，所以必须主动开启
+
+4、扫描器的范围
+    只会将包中被@Component、@Controller、@Service、@Repository注解的类以bean的形式注册到IOC容器中，是不会扫描@Aspect
+    注解的。注解式aop不需要被扫描器扫描，只需要开启注解式aop支持即可使用
+
+5、注解式aop获取目标对象的参数
+    1、以前置通知为例(@Before)
+    2、需要依赖JoinPoint的对象jp，可以获取目标对象的一切东西
+        获取目标对象：jp.getTarget()
+        获取目标对象的目标方法：jp.getSignature().getName()
+        获取目标方法的参数列表：jp.getArgs()
+
+6、返回通知(@AfterReturning)
+    1、获取目标方法的返回值，见AnnotationAdvice
+
+7、异常通知(@AfterThrowing)
+    1、其方法的第二个参数，可以指定异常的类型，实现针对特定类型异常执行通知
+
+8、最终通知(@After)
+    1、无论目标方法是否发生异常，此通知一定会执行
+
+9、环绕通知(@Around)
+    1、环绕通知获取目标对象、目标对象的目标方法、目标方法的参数列表、目标方法的返回值等操作是通过
+       ProceedingJoinPoint类型的对象pjp实现的

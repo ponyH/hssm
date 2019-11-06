@@ -18,4 +18,9 @@ public class AopController {
     public void aopAdvice(){
         aopService.aopAdvice();
     }
+
+    @RequestMapping("/annotationAop")
+    public void annotationAdvice(){
+        aopService.annotationAdvice();
+    }
 }

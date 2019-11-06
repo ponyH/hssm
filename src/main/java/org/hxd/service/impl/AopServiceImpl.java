@@ -10,4 +10,9 @@ public class AopServiceImpl implements AopService {
     public void aopAdvice() {
         System.out.println("我是一个业务方法");
     }
+
+    @Override
+    public void annotationAdvice() {
+        System.out.println("我是另一个业务方法");
+    }
 }

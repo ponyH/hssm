@@ -111,4 +111,7 @@
         <aop:advisor advice-ref="exceptionAdvice" pointcut-ref="aopPointcut"/>
         <aop:advisor advice-ref="aroundAdvice" pointcut-ref="aopPointcut"/>
     </aop:config>
+
+    <!--开启注解式aop配置-->
+    <aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="true"/>
 </beans>
